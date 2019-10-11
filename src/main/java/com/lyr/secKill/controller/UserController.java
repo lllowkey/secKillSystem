@@ -16,16 +16,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.RequestWrapper;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by WIN10 on 2019/10/10.
  */
 @Controller("user")
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController{
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
+    //用户获取otp短信接口
+    @RequestMapping("/getotp")
+    @ResponseBody
+    public CommonReturnType getOtp(@RequestParam(name = "telephone")String telephone){
+        Random random = new Random();
+        int randomInt = random.nextInt(99999);
+        randomInt += 10000;
+        String otpCode = String.valueOf(randomInt);
+
+        //使用httpSession绑定用户手机号和otpCode
+        httpServletRequest.getSession().setAttribute(telephone,otpCode);
+
+        System.out.println("telephone = "+telephone+" & otpCode = "+otpCode);
+
+        return CommonReturnType.create(null);
+    }
 
     @RequestMapping("/get")
     @ResponseBody
@@ -34,6 +55,8 @@ public class UserController {
         UserModel userModel = userService.getUserById(id);
 
         if(userModel == null){
+
+//            userModel.setEncryptPassword("123");
             throw new BusinessException((EmBusinessError.USER_NOT_EXIST));
         }
 
@@ -42,6 +65,8 @@ public class UserController {
         return CommonReturnType.create(userVO);
     }
 
+
+
     private UserVO convertFromModel(UserModel userModel){
         if(userModel == null){
             return null;
@@ -49,20 +74,6 @@ public class UserController {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userModel,userVO);
         return userVO;
-    }
-
-    //定义exceptionhandler解决违背controller层吸收的exception
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public Object handlerException(HttpServletRequest request, Exception ex){
-        BusinessException businessException = (BusinessException)ex;
-
-        Map<String,Object> responseData = new HashMap<>();
-        responseData.put("errCode",businessException.getErrCode());
-        responseData.put("errMsg",businessException.getErrMsg());
-
-        return CommonReturnType.create(responseData,"fail");
     }
 
 }
