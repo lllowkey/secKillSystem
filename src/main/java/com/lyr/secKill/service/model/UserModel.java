@@ -1,9 +1,12 @@
 package com.lyr.secKill.service.model;
 
+import com.lyr.secKill.error.BusinessException;
+import com.lyr.secKill.error.EmBusinessError;
+
 /**
  * Created by WIN10 on 2019/10/10.
  */
-public class UserModel {
+public class UserModel{
     private Integer id;
     private String name;
     private Byte gender;
