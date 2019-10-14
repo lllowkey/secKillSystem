@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class App 
 {
     @Autowired
-    private UserDOMapper userDOMapper;
+private UserDOMapper userDOMapper;
     @RequestMapping("/")
     public String home(){
         UserDO userDO = userDOMapper.selectByPrimaryKey(1);
