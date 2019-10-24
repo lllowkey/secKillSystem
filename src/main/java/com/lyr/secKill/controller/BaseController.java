@@ -33,6 +33,7 @@ public class BaseController {
             responseData.put("errCode", EmBusinessError.UNKNOWN_ERROR.getErrCode());
             responseData.put("errMsg",EmBusinessError.UNKNOWN_ERROR.getErrMsg());
         }
+        System.out.println(ex.getMessage());
         return CommonReturnType.create(responseData,"fail");
     }
 }

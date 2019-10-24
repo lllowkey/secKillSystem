@@ -39,6 +39,28 @@ public class UserController extends BaseController{
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    //用户登录接口
+    @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam("telephone")String telephone,
+                                  @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        //入参校验
+        if(org.apache.commons.lang3.StringUtils.isEmpty(telephone)||
+        StringUtils.isEmpty(password)){
+            throw  new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        //用户登录服务，校验用户登录是否合法
+        UserModel userModel = userService.validateLogin(telephone,this.EncodeByMd5(password));
+
+        //将登录凭证加入到用户登录成功的session内
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+
+        return CommonReturnType.create(null);
+    }
+
+
     //用户注册接口
     @RequestMapping(value = "/register",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
     @ResponseBody
@@ -80,7 +102,10 @@ public class UserController extends BaseController{
     @ResponseBody
     public CommonReturnType getOtp(@RequestParam(name = "telephone")String telephone){
         Random random = new Random();
-        int randomInt = random.nextInt(99999);
+        int randomInt = 0;
+        while(randomInt < 90000){
+            randomInt = random.nextInt(99999);
+        }
         randomInt += 10000;
         String otpCode = String.valueOf(randomInt);
 
@@ -100,8 +125,9 @@ public class UserController extends BaseController{
 
         if(userModel == null){
 
-//            userModel.setEncryptPassword("123");
-            throw new BusinessException((EmBusinessError.USER_NOT_EXIST));
+
+            userModel.setEncryptPassword("123");
+//            throw new BusinessException((EmBusinessError.USER_NOT_EXIST));
         }
 
         UserVO userVO = convertFromModel(userModel);
