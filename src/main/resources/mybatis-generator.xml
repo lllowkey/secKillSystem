@@ -33,22 +33,22 @@
 
         <!--生成对应的表 以及类名-->
         <!--  这个之前生成过啦  注释了吧-->
-        <table tableName="user_info" domainObjectName="UserDO"
+        <!--<table tableName="user_info" domainObjectName="UserDO"
         enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
         enableSelectByExample="false" selectByExampleQueryId="false"></table>
         <table tableName="user_password" domainObjectName="UserPasswordDO"
         enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+
+        <!-- 商品表 xml-->
+        <table tableName="item" domainObjectName="ItemDO"
+        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
         enableSelectByExample="false" selectByExampleQueryId="false"></table>
 
-        <!--&lt;!&ndash; 商品表 xml&ndash;&gt;-->
-        <!--<table tableName="item" domainObjectName="ItemDO"-->
-        <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
-        <!--enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-
-        <!--&lt;!&ndash; 库存表 对应数据库表item_stock   生成do和xml问价&ndash;&gt;-->
-        <!--<table tableName="item_stock" domainObjectName="ItemStockDO"-->
-        <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
-        <!--enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+        <!-- 库存表 对应数据库表item_stock   生成do和xml问价-->
+        <table tableName="item_stock" domainObjectName="ItemStockDO"
+        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        enableSelectByExample="false" selectByExampleQueryId="false"></table>
 
         <!-- 订单表 xml-->
         <!--<table tableName="order_info" domainObjectName="OrderDO"-->
