@@ -26,7 +26,7 @@ private UserDOMapper userDOMapper;
     @RequestMapping("/")
     public String home(){
 //        int testinsert = userDOMapper.insertUser("john","1");
-        UserDO userDO = userDOMapper.selectByPrimaryKey(36);
+        UserDO userDO = userDOMapper.selectByPrimaryKey(30);
         if(userDO == null){
             return "用户对象不存在";
         }else{
