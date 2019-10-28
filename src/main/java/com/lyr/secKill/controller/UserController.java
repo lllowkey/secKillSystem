@@ -126,8 +126,8 @@ public class UserController extends BaseController{
         if(userModel == null){
 
 
-            userModel.setEncryptPassword("123");
-//            throw new BusinessException((EmBusinessError.USER_NOT_EXIST));
+//            userModel.setEncryptPassword("123");
+            throw new BusinessException((EmBusinessError.USER_NOT_EXIST));
         }
 
         UserVO userVO = convertFromModel(userModel);
