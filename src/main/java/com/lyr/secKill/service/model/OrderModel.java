@@ -10,6 +10,7 @@ public class OrderModel {
     //20191029100012828
     private String id;
 
+    //用户id
     private Integer userId;
 
     //商品id
