@@ -130,7 +130,7 @@
             <configuration>
                 <!--允许移动生成的文件-->
                 <verbose>true</verbose>
-                <!--允许移动生成的文件-->
+                <!--允许覆盖生成的文件-->
                 <overwrite>false</overwrite>
                 <configurationFile>
                     src/main/resources/mybatis-generator.xml
