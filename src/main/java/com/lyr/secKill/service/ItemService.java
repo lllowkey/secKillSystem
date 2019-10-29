@@ -1,5 +1,6 @@
 package com.lyr.secKill.service;
 
+import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.service.model.ItemModel;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public interface ItemService {
 
     //创建商品
-    ItemModel createItem(ItemModel itemModel);
+    ItemModel createItem(ItemModel itemModel) throws BusinessException;
 
     //商品列表浏览
     List<ItemModel> listItem();

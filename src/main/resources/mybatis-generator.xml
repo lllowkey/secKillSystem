@@ -41,19 +41,19 @@
         enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
 
         <!-- 商品表 xml-->
-        <table tableName="item" domainObjectName="ItemDO"
-        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-        enableSelectByExample="false" selectByExampleQueryId="false"></table>
-
-        <!-- 库存表 对应数据库表item_stock   生成do和xml问价-->
-        <table tableName="item_stock" domainObjectName="ItemStockDO"
-        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-        enableSelectByExample="false" selectByExampleQueryId="false"></table>
-
-        <!-- 订单表 xml-->
-        <!--<table tableName="order_info" domainObjectName="OrderDO"-->
+        <!--<table tableName="item" domainObjectName="ItemDO"-->
         <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
         <!--enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+
+        <!-- 库存表 对应数据库表item_stock   生成do和xml问价-->
+        <!--<table tableName="item_stock" domainObjectName="ItemStockDO"
+        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+
+        <!-- 订单表 xml-->
+        <table tableName="order_info" domainObjectName="OrderDO"
+        enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        enableSelectByExample="false" selectByExampleQueryId="false"></table>
 
         <!--序列号表-->
         <!--<table tableName="sequence_info" domainObjectName="SequenceDO"-->

@@ -1,38 +1,31 @@
-package com.lyr.secKill.service.model;
+package com.lyr.secKill.controller.viewobject;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
- * Created by WIN10 on 2019/10/28.
+ * Created by WIN10 on 2019/10/29.
  */
-public class ItemModel {
-
+public class ItemVO {
     private Integer id;
 
     //商品名
-    @NotNull(message = "商品名称不能为空")
     private String title;
 
     //商品价格
-    @NotNull(message = "商品价格不能为空")
-    @Min(value = 0,message = "商品价格不能小于0")
     private BigDecimal price;
 
     //商品的库存
-    @NotNull(message = "库存不能不填")
     private Integer stock;
 
     //商品的描述
-    @NotNull(message = "商品描述不能不填")
     private String description;
 
     //商品的销量
     private Integer sales;
 
     //商品描述图片的url
-    @NotNull(message = "图片信息不能为空")
     private String imgUrl;
 
     public Integer getId() {
