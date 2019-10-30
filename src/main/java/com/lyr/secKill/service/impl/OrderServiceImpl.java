@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Service
 public class OrderServiceImpl implements OrderService{
@@ -64,13 +67,22 @@ public class OrderServiceImpl implements OrderService{
 
         return null;
     }
+
+
     private String generateOrderNo(){
         //订单号16位
+        StringBuilder stringBuilder = new StringBuilder();
         //前8位为年月日
+        LocalDateTime now = LocalDateTime.now();
+        String nowDate = now.format(DateTimeFormatter.ISO_DATE).replace("-","");
+        stringBuilder.append(nowDate);
 
         //中间6位为自增序列
 
-        //最后2位为分库分表位
+
+
+        //最后2位为分库分表位,暂时写死
+        stringBuilder.append("00");
 
         return null;
     }
