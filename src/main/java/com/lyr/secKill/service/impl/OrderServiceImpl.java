@@ -1,7 +1,9 @@
 package com.lyr.secKill.service.impl;
 
 import com.lyr.secKill.dao.OrderDOMapper;
+import com.lyr.secKill.dao.SequenceDOMapper;
 import com.lyr.secKill.dataobject.OrderDO;
+import com.lyr.secKill.dataobject.SequenceDO;
 import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.error.EmBusinessError;
 import com.lyr.secKill.service.ItemService;
@@ -14,8 +16,10 @@ import org.omg.CORBA.ORB;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sound.midi.Sequence;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +33,8 @@ public class OrderServiceImpl implements OrderService{
     private ItemService itemService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SequenceDOMapper sequenceDOMapper;
 
     @Override
     @Transactional
@@ -60,15 +66,15 @@ public class OrderServiceImpl implements OrderService{
         orderModel.setOrderPrice(itemModel.getPrice().multiply(new BigDecimal(amount)));
 
         //生成交易流水号
+        orderModel.setId(generateOrderNo());
         OrderDO orderDO = converFromOrderModel(orderModel);
         orderDOMapper.insertSelective(orderDO);
 
         //返回前端
-
-        return null;
+        return orderModel;
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private String generateOrderNo(){
         //订单号16位
         StringBuilder stringBuilder = new StringBuilder();
@@ -78,13 +84,24 @@ public class OrderServiceImpl implements OrderService{
         stringBuilder.append(nowDate);
 
         //中间6位为自增序列
+        //获取当前sequence
+        int sequence = 0;
+        SequenceDO sequenceDO = sequenceDOMapper.getSquenceByName("order_info");
 
-
+        sequence = sequenceDO.getCurrentValue();
+        //更新下一次的currentValue
+        sequenceDO.setCurrentValue(sequenceDO.getCurrentValue()+sequenceDO.getStep());
+        sequenceDOMapper.updateByPrimaryKey(sequenceDO);
+        String sequnceStr = String.valueOf(sequence);
+        for (int i = 0; i < 6 - sequnceStr.length(); i++) {
+            stringBuilder.append(0);
+        }
+        stringBuilder.append(sequnceStr);
 
         //最后2位为分库分表位,暂时写死
         stringBuilder.append("00");
 
-        return null;
+        return stringBuilder.toString();
     }
 
     private OrderDO converFromOrderModel(OrderModel orderModel){

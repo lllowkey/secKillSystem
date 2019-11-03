@@ -55,8 +55,6 @@ public class ItemController extends BaseController {
 
         ItemVO itemVO = convertVOFromModel(itemModel);
 
-
-
         return CommonReturnType.create(itemVO);
 
     }
