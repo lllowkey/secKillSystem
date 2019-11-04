@@ -1,5 +1,7 @@
 package com.lyr.secKill.controller.viewobject;
 
+import org.joda.time.DateTime;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -27,6 +29,18 @@ public class ItemVO {
 
     //商品描述图片的url
     private String imgUrl;
+
+    //商品是否在秒杀活动中,0没有秒杀活动,1表示活动还未开始,2活动结束
+    private Integer promoStatus;
+
+    //秒杀活动价格
+    private BigDecimal promoPrice;
+
+    //秒杀活动id
+    private Integer promoId;
+
+    //秒杀活动开始时间
+    private DateTime startDate;
 
     public Integer getId() {
         return id;
@@ -82,5 +96,37 @@ public class ItemVO {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public Integer getPromoStatus() {
+        return promoStatus;
+    }
+
+    public void setPromoStatus(Integer promoStatus) {
+        this.promoStatus = promoStatus;
+    }
+
+    public BigDecimal getPromoPrice() {
+        return promoPrice;
+    }
+
+    public void setPromoPrice(BigDecimal promoPrice) {
+        this.promoPrice = promoPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
+    }
+
+    public DateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(DateTime startDate) {
+        this.startDate = startDate;
     }
 }

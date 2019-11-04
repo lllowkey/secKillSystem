@@ -1,6 +1,7 @@
 package com.lyr.secKill.dao;
 
 import com.lyr.secKill.dataobject.ItemDO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -57,4 +58,6 @@ public interface ItemDOMapper {
      * @mbg.generated Mon Oct 28 17:35:02 CST 2019
      */
     int updateByPrimaryKey(ItemDO record);
+
+    int increaseSale(@Param("id")Integer id,@Param("amount")Integer amount);
 }

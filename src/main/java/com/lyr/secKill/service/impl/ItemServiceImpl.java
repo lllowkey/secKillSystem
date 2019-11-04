@@ -7,7 +7,9 @@ import com.lyr.secKill.dataobject.ItemStockDO;
 import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.error.EmBusinessError;
 import com.lyr.secKill.service.ItemService;
+import com.lyr.secKill.service.PromoService;
 import com.lyr.secKill.service.model.ItemModel;
+import com.lyr.secKill.service.model.PromoModel;
 import com.lyr.secKill.validator.ValidationResult;
 import com.lyr.secKill.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,9 @@ public class ItemServiceImpl implements ItemService{
 
     @Autowired
     private ItemStockDOMapper itemStockDOMapper;
+
+    @Autowired
+    private PromoService promoService;
 
 
     private ItemDO convertItemDOFromItemModel(ItemModel itemModel){
@@ -105,6 +110,12 @@ public class ItemServiceImpl implements ItemService{
         //将dataobject->model
         ItemModel itemModel = convertModelFromDataObject(itemDO,itemStockDO);
 
+        //获取活动商品信息
+        PromoModel promoModel = promoService.getPromoByItemId(itemModel.getId());
+        if(promoModel != null && promoModel.getStatus().intValue()!=3){
+            itemModel.setPromoModel(promoModel);
+        }
+
         return itemModel;
     }
 
@@ -119,6 +130,12 @@ public class ItemServiceImpl implements ItemService{
             //更新库存失败
             return false;
         }
+    }
+
+    @Override
+    @Transactional
+    public void increaseSales(Integer itemId, Integer amount) throws BusinessException {
+        itemDOMapper.increaseSale(itemId,amount);
     }
 
     private ItemModel convertModelFromDataObject(ItemDO itemDO,ItemStockDO itemStockDO){
