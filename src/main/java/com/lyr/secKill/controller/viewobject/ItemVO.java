@@ -40,7 +40,7 @@ public class ItemVO {
     private Integer promoId;
 
     //秒杀活动开始时间
-    private DateTime startDate;
+    private String startDate;
 
     public Integer getId() {
         return id;
@@ -122,11 +122,11 @@ public class ItemVO {
         this.promoId = promoId;
     }
 
-    public DateTime getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateTime startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 }

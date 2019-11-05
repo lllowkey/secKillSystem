@@ -5,6 +5,7 @@ import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.response.CommonReturnType;
 import com.lyr.secKill.service.ItemService;
 import com.lyr.secKill.service.model.ItemModel;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -84,7 +85,7 @@ public class ItemController extends BaseController {
             itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
             itemVO.setPromoId(itemModel.getPromoModel().getId());
             itemVO.setPromoPrice(itemModel.getPromoModel().getPromoItemPrice());
-            itemVO.setStartDate(itemModel.getPromoModel().getStartDate());
+            itemVO.setStartDate(itemModel.getPromoModel().getStartDate().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
 
         }else{
             itemVO.setPromoStatus(0);
