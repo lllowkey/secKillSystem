@@ -58,7 +58,12 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.7</version>
     </dependency>
-
+    <!--jodaTime-->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.9.1</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -130,7 +135,7 @@
             <configuration>
                 <!--允许移动生成的文件-->
                 <verbose>true</verbose>
-                <!--允许移动生成的文件-->
+                <!--允许覆盖生成的文件-->
                 <overwrite>false</overwrite>
                 <configurationFile>
                     src/main/resources/mybatis-generator.xml
