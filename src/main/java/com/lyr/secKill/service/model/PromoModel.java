@@ -2,12 +2,13 @@ package com.lyr.secKill.service.model;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Created by WIN10 on 2019/11/4.
  */
-public class PromoModel {
+public class PromoModel implements Serializable{
     private Integer id;
 
     //秒杀活动状态,1还未开始,2进行中,3已结束

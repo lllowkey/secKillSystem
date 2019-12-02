@@ -2,12 +2,13 @@ package com.lyr.secKill.service.model;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Created by WIN10 on 2019/10/28.
  */
-public class ItemModel {
+public class ItemModel implements Serializable{
 
     private Integer id;
 

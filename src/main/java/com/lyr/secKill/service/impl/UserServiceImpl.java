@@ -14,8 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by WIN10 on 2019/10/10.
@@ -26,6 +29,9 @@ public class UserServiceImpl implements UserService{
     @Autowired private UserDOMapper userDOMapper;
 
     @Autowired private UserPasswordDOMapper userPasswordDOMapper;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Autowired
     private ValidatorImpl  validator;
@@ -42,6 +48,17 @@ public class UserServiceImpl implements UserService{
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDo.getId());
 
         return convertFromDataObject(userDo,userPasswordDO);
+    }
+
+    @Override
+    public UserModel getUserByIdInCache(Integer id) {
+        UserModel usermodel = (UserModel)redisTemplate.opsForValue().get("user_validate_" + id);
+        if(usermodel == null) {
+            usermodel = this.getUserById(id);
+            redisTemplate.opsForValue().set("user_validate_" + id, usermodel);
+            redisTemplate.expire("user_validate_" + id, 10, TimeUnit.MINUTES);
+        }
+        return usermodel;
     }
 
     @Override

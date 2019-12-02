@@ -10,13 +10,17 @@ import com.lyr.secKill.service.model.UserModel;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.GenericFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.ws.RequestWrapper;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -24,6 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by WIN10 on 2019/10/10.
@@ -36,8 +42,9 @@ public class UserController extends BaseController{
     @Autowired
     private UserService userService;
 
+
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    private RedisTemplate redisTemplate;
 
     //用户登录接口
     @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
@@ -52,12 +59,21 @@ public class UserController extends BaseController{
 
         //用户登录服务，校验用户登录是否合法
         UserModel userModel = userService.validateLogin(telephone,this.EncodeByMd5(password));
-
         //将登录凭证加入到用户登录成功的session内
-        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
-        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
 
-        return CommonReturnType.create(null);
+        //若用户登录验证成功后将对应的登录信息和登录凭证一起存入redis
+        //生成登录凭证,UUID
+        String uuidToken = UUID.randomUUID().toString();
+        uuidToken = uuidToken.replace("-","");
+        //建立token和用户登陆态之间的联系
+        redisTemplate.opsForValue().set(uuidToken,userModel);
+        redisTemplate.expire(uuidToken,1, TimeUnit.HOURS);
+
+//        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+//        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+
+        //下发token
+        return CommonReturnType.create(uuidToken);
     }
 
 
@@ -69,9 +85,11 @@ public class UserController extends BaseController{
                                      @RequestParam(name = "name")String name,
                                      @RequestParam(name = "gender")Integer gender,
                                      @RequestParam(name = "age")Integer age,
-                                     @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
-    //验证手机号和otpcode相符合
-    String inSesssionOtpCode = (String)this.httpServletRequest.getSession().getAttribute(telephone);
+                                     @RequestParam(name = "password")String password,
+                                     HttpServletRequest request) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    //验证手机号和otpcode相符合httpServletRequest.getSession().setAttribute(telephone,otpCode);
+//    String inSesssionOtpCode = (String)request.getSession(true).getAttribute(telephone);
+        String inSesssionOtpCode = (String)redisTemplate.opsForValue().get(telephone);
     if (!com.alibaba.druid.util.StringUtils.equals(otpCode,inSesssionOtpCode)){
         throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不符");
     }
@@ -100,7 +118,7 @@ public class UserController extends BaseController{
     //用户获取otp短信接口
     @RequestMapping(value = "/getotp",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType getOtp(@RequestParam(name = "telephone")String telephone){
+    public CommonReturnType getOtp(@RequestParam(name = "telephone")String telephone, HttpServletRequest request, HttpServletResponse response){
         Random random = new Random();
         int randomInt = 0;
         while(randomInt < 90000){
@@ -110,8 +128,12 @@ public class UserController extends BaseController{
         String otpCode = String.valueOf(randomInt);
 
         //使用httpSession绑定用户手机号和otpCode
-        httpServletRequest.getSession().setAttribute(telephone,otpCode);
-
+//        HttpSession session = request.getSession(true);
+//        session.setAttribute(telephone,otpCode);
+//        Cookie cookie = new Cookie("JSESSIONID",session.getId());
+//        response.addCookie(cookie);
+        redisTemplate.opsForValue().set(telephone,otpCode);
+        redisTemplate.expire(telephone,1, TimeUnit.MINUTES);
         System.out.println("telephone = "+telephone+" & otpCode = "+otpCode);
 
         return CommonReturnType.create(null);
