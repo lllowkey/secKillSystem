@@ -2,6 +2,7 @@ package com.lyr.secKill.controller;
 
 import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.error.EmBusinessError;
+import com.lyr.secKill.mq.MqProducer;
 import com.lyr.secKill.response.CommonReturnType;
 import com.lyr.secKill.service.OrderService;
 import com.lyr.secKill.service.model.OrderModel;
@@ -26,6 +27,9 @@ public class OrderController extends BaseController {
     @Autowired
     RedisTemplate redisTemplate;
 
+    @Autowired
+    MqProducer mqProducer;
+
     //封装下单请求
     @RequestMapping(value = "/createOrder",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
     @ResponseBody
@@ -46,10 +50,12 @@ public class OrderController extends BaseController {
         //获取用户信息
 //        UserModel userModel = (UserModel)httpServletRequest.getSession().getAttribute("LOGIN_USER");
 
-        OrderModel orderModel = orderService.createOrder(userModel.getId(),itemId,promoId ,amount);
+//        OrderModel orderModel = orderService.createOrder(userModel.getId(),itemId,promoId ,amount);
 
-
-        return CommonReturnType.create(orderModel);
+        if(!mqProducer.transactionAsyncReduceStock(userModel.getId(),itemId,promoId,amount)){
+            throw new BusinessException(EmBusinessError.UNKNOWN_ERROR,"下单失败");
+        }
+        return CommonReturnType.create(null);
     }
 
 }

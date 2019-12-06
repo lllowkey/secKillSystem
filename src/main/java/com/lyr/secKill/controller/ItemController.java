@@ -5,6 +5,7 @@ import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.response.CommonReturnType;
 import com.lyr.secKill.service.CacheService;
 import com.lyr.secKill.service.ItemService;
+import com.lyr.secKill.service.PromoService;
 import com.lyr.secKill.service.model.ItemModel;
 import org.apache.ibatis.annotations.Param;
 import org.joda.time.format.DateTimeFormat;
@@ -35,6 +36,9 @@ public class ItemController extends BaseController {
     @Autowired
     private CacheService cacheService;
 
+    @Autowired
+    private PromoService promoService;
+
     //创建商品
     @RequestMapping(value = "/create",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
     @ResponseBody
@@ -56,6 +60,14 @@ public class ItemController extends BaseController {
 
 
         return CommonReturnType.create(itemVO);
+    }
+
+
+    @RequestMapping(value = "/publishpromo",method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType publishpromo(@RequestParam(name = "id")Integer id){
+        promoService.publishPromo(id);
+        return CommonReturnType.create(null);
     }
 
     /*商品详情页浏览*/
