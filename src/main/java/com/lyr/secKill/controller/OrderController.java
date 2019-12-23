@@ -4,6 +4,7 @@ import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.error.EmBusinessError;
 import com.lyr.secKill.mq.MqProducer;
 import com.lyr.secKill.response.CommonReturnType;
+import com.lyr.secKill.service.ItemService;
 import com.lyr.secKill.service.OrderService;
 import com.lyr.secKill.service.model.OrderModel;
 import com.lyr.secKill.service.model.UserModel;
@@ -23,6 +24,9 @@ public class OrderController extends BaseController {
     private OrderService orderService;
     @Autowired
     private HttpServletRequest httpServletRequest;
+
+    @Autowired
+    ItemService itemService;
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -52,7 +56,11 @@ public class OrderController extends BaseController {
 
 //        OrderModel orderModel = orderService.createOrder(userModel.getId(),itemId,promoId ,amount);
 
-        if(!mqProducer.transactionAsyncReduceStock(userModel.getId(),itemId,promoId,amount)){
+        //加入库存流水init状态
+        String stockLogId = itemService.initStockLog(itemId, amount);
+
+        //完成下单事务性消息
+        if(!mqProducer.transactionAsyncReduceStock(userModel.getId(),itemId,promoId,amount,stockLogId)){
             throw new BusinessException(EmBusinessError.UNKNOWN_ERROR,"下单失败");
         }
         return CommonReturnType.create(null);

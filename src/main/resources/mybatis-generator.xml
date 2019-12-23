@@ -8,9 +8,9 @@
 
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://47.98.241.164:3306/seckill"
+                        connectionURL="jdbc:mysql://121.43.145.211:3306/seckill"
                         userId="root"
-                        password="Aa123456">
+                        password="123456">
         </jdbcConnection>
 
         <javaTypeResolver >
@@ -61,7 +61,7 @@
         <!--enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
 
         <!--秒杀活动表-->
-        <table tableName="promo" domainObjectName="PromoDO"
+        <table tableName="stock_log" domainObjectName="StockLogDO"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false"></table>
 

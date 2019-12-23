@@ -1,6 +1,8 @@
 package com.lyr.secKill.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.lyr.secKill.dao.StockLogDOMapper;
+import com.lyr.secKill.dataobject.StockLogDO;
 import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.service.OrderService;
 import org.apache.ibatis.ognl.IntHashMap;
@@ -38,6 +40,9 @@ public class MqProducer {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    StockLogDOMapper stockLogDOMapper;
+
 
     @PostConstruct
     public void init() throws MQClientException {
@@ -59,11 +64,17 @@ public class MqProducer {
                 Integer promoId = (Integer)((Map)arg).get("promoId");
                 Integer userId = (Integer)((Map)arg).get("userId");
                 Integer amount = (Integer)((Map)arg).get("amount");
+                String stockLogId = (String)((Map)arg).get("stockLogId");
 
                 try {
-                    orderService.createOrder(userId,itemId,promoId,amount);
+                    orderService.createOrder(userId,itemId,promoId,amount,stockLogId);
                 } catch (BusinessException e) {
                     e.printStackTrace();
+
+                    //设置对应的stockLog为回滚状态
+                    StockLogDO stockLogDO = stockLogDOMapper.selectByPrimaryKey(stockLogId);
+                    stockLogDO.setStatus(3);
+                    stockLogDOMapper.updateByPrimaryKeySelective(stockLogDO);
                     return LocalTransactionState.ROLLBACK_MESSAGE;
                 }
                 return LocalTransactionState.COMMIT_MESSAGE;
@@ -77,23 +88,36 @@ public class MqProducer {
                 Map<String,Object> map = JSON.parseObject(jsonString, Map.class);
                 Integer itemId = (Integer)map.get("itemId");//////////////订单流水状态
                 Integer amount = (Integer)map.get("amount");
-                return null;
+                String stockLogId= (String)map.get("stockLogId");
+                StockLogDO stockLogDO = stockLogDOMapper.selectByPrimaryKey(stockLogId);
+                if (stockLogDO != null){
+                    return LocalTransactionState.UNKNOW;
+                }
+                if (stockLogDO.getStatus().intValue() ==2){
+                    return LocalTransactionState.COMMIT_MESSAGE;
+                }else if(stockLogDO.getStatus().intValue() ==1){
+                    return LocalTransactionState.UNKNOW;
+                }
+                return LocalTransactionState.ROLLBACK_MESSAGE;
             }
         });
     }
 
 
     //事务性同步库存扣减消息
-    public boolean transactionAsyncReduceStock(Integer userId, Integer itemId, Integer promoId, Integer amount){
+    public boolean transactionAsyncReduceStock(Integer userId, Integer itemId, Integer promoId, Integer amount,String stockLogId){
         Map<String,Object> bodyMap = new HashMap();
         bodyMap.put("itemId",itemId);
         bodyMap.put("amount",amount);
+        bodyMap.put("stockLogId",stockLogId);
 
         Map<String,Object> argsMap = new HashMap();
         argsMap.put("itemId",itemId);
         argsMap.put("amount",amount);
         argsMap.put("userId",userId);
         argsMap.put("promoId",promoId);
+        argsMap.put("stockLogId",stockLogId);
+
 
         Message message = new Message(topicName,"increase",
                 JSON.toJSON(bodyMap).toString().getBytes(Charset.forName("UTF-8")));

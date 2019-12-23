@@ -2,8 +2,10 @@ package com.lyr.secKill.service.impl;
 
 import com.lyr.secKill.dao.ItemDOMapper;
 import com.lyr.secKill.dao.ItemStockDOMapper;
+import com.lyr.secKill.dao.StockLogDOMapper;
 import com.lyr.secKill.dataobject.ItemDO;
 import com.lyr.secKill.dataobject.ItemStockDO;
+import com.lyr.secKill.dataobject.StockLogDO;
 import com.lyr.secKill.error.BusinessException;
 import com.lyr.secKill.error.EmBusinessError;
 import com.lyr.secKill.mq.MqProducer;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.validation.Validator;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,9 @@ public class ItemServiceImpl implements ItemService{
 
     @Autowired
     private PromoService promoService;
+
+    @Autowired
+    private StockLogDOMapper stockLogDOMapper;
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -183,6 +189,23 @@ public class ItemServiceImpl implements ItemService{
         boolean mqResult = mqProducer.asyncReduceStock(itemId,amount);
 
         return mqResult;
+    }
+
+    //初始化对应的库存流水
+    @Override
+    @Transactional
+    public String initStockLog(Integer itemId, Integer amount) {
+        StockLogDO stockLogDO = new StockLogDO();
+        stockLogDO.setItemId(itemId);
+        stockLogDO.setAmount(amount);
+        stockLogDO.setStockLogId(UUID.randomUUID().toString().replace("-",""));
+        //1表示初始状态
+        stockLogDO.setStatus(1);
+
+        stockLogDOMapper.insertSelective(stockLogDO);
+
+        return stockLogDO.getStockLogId();
+
     }
 
     private ItemModel convertModelFromDataObject(ItemDO itemDO,ItemStockDO itemStockDO){
